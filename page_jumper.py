@@ -9,15 +9,18 @@ from selenium.webdriver.common.keys import Keys
 
 class PageJumper:
 
+    def __init__(self):
+        pass
+
     def jump_page(self, url: str):
         if url.find('page=') > 0:
             page_number = int(url[url.find('page=') + 5:url.find('&order')])
             nextlink = url[0:url.find('page=') + 5] + str(page_number + 1) + url[url.find('&order'):]
         else:
-            nextlink = url[0:url.find('BE')+3] + 'page=2' + url[url.find('&order'):]
+            nextlink = url[0:url.find('BE') + 3] + 'page=2' + url[url.find('&order'):]
         return nextlink
 
-    def extract_links(self, url):
+    def extract_links(self, url: str):
         driver = webdriver.Chrome()
         # driver = webdriver.Firefox()
         driver.implicitly_wait(30)
@@ -28,11 +31,10 @@ class PageJumper:
         # And then it's like Beautiful soup
         for elem in soup.find_all('a', attrs={"class": "card__title-link"}):
             links.append(elem.get('href'))
-        
-        driver.close()
-        
-        return links
 
+        driver.close()
+
+        return links
 
     def scrap_pages(self, url: str):
         links = list()
@@ -46,12 +48,10 @@ class PageJumper:
                 break
         return links
 
-    def create_csv(self, url):
+    def create_csv(self, url: str):
         links = self.scrap_pages(url)
         file_links_housing = pd.DataFrame(links)
         file_links_housing.to_csv('assets/links_inmoweb.csv')
-
-
 
 
 pageJumper = PageJumper()
