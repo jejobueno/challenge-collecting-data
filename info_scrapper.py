@@ -13,6 +13,10 @@ from selenium.webdriver.common.keys import Keys
 class InfoScrapper:
 
     def __init__(self):
+        self.postalCode = list()
+        self.typeProperty = list()
+        self.subtypeProperty = list()
+        self.price = list()
         pass
 
     def extract_info(self, url: str):
@@ -21,7 +25,6 @@ class InfoScrapper:
         driver.implicitly_wait(30)
         driver.get(url)
         soup: BeautifulSoup = BeautifulSoup(driver.page_source, 'lxml')
-        info: Dict = dict()
 
         # And then it's like Beautiful soup
         for elem in soup.find_all('script', attrs={"type": "text/javascript"}):
@@ -31,13 +34,7 @@ class InfoScrapper:
         data = re.search('{.*}', dataStr).group(0)
         jsonData = json.loads(data)
 
-        print(jsonData)
-        print(type(jsonData))
-        properties = jsonData['property']
-        print(type(properties))
-        driver.close()
-
-        return info
+        return jsonData
 
     def scrap_pages(self, url: str):
         links = list()
@@ -50,7 +47,53 @@ class InfoScrapper:
             else:
                 break
         return links
+    
+    def get_info(self, jsondict):
+        #print(jsondict)
+        info = dict()
+        properties = jsondict['property']
+        # Saving the postal code (locality) of the property
+        if properties['location']:
+            self.postalCode.append(properties['location']['postalCode'])
+        else:
+            self.postalCode.append(None)
+        print(self.postalCode)
 
+        # Saving the type of the property
+        if properties['type']:
+            self.typeProperty.append(properties['type'])
+        else:
+            self.typeProperty.append(None)
+        print(self.typeProperty)
+
+        # Saving the subtype of the property
+        if properties['type']:
+            self.subtypeProperty.append(properties['subtype'])
+        else:
+            self.subtypeProperty.append(None)
+        print(self.subtypeProperty)
+
+        # Saving the price of the property
+        if jsondict['transaction']['sale']['price']:
+            self.price.append(jsondict['transaction']['sale']['price'])
+        else:
+            self.price.append(None)
+        print(self.price)
+
+        ### keep going searching properties ####
+
+        info = pd.DataFrame(list(zip(self.postalCode, self.typeProperty, self.subtypeProperty, self.price)),
+                            columns=['postalCode', 'type', 'subtype', 'price'])
+
+        return info
+
+    def create_csv(self, data):
+        file_links_housing = pd.DataFrame(data)
+        file_links_housing.to_csv('assets/housing-data.csv')
 
 infograpper = InfoScrapper()
-infograpper.extract_info('https://www.immoweb.be/en/classified/apartment/for-sale/ixelles/1050/9333411?searchId=60ad0a1ce3697')
+info = infograpper.extract_info('https://www.immoweb.be/en/classified/apartment/for-sale/ixelles/1050/9333411?searchId=60ad0a1ce3697')
+
+data = infograpper.get_info(info)
+
+infograpper.create_csv(data)
