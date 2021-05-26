@@ -37,10 +37,9 @@ class PageJumper:
     def scrap_pages(self, url: str):
         links = list()
         while True:
-
-            print(links)
+            print(len(links))
             page_links = self.extract_links(url)
-            if page_links or len(links)<10000:
+            if page_links and len(links) < 15000:
                 links += page_links
                 url = self.jump_page(url)
             else:
@@ -50,10 +49,10 @@ class PageJumper:
     def create_csv(self, url):
         links = self.scrap_pages(url)
         file_links_housing = pd.DataFrame(links)
-        file_links_housing.to_csv(".assets/links-inmoweb.csv", index=False)
+        file_links_housing.to_csv('assets/links_inmoweb.csv')
 
 
 
 
 pageJumper = PageJumper()
-links = pageJumper.create_csv('https://www.immoweb.be/en/search/house-and-apartment/for-sale?countries=BE&orderBy=relevance')
+pageJumper.create_csv('https://www.immoweb.be/en/search/house-and-apartment/for-sale?countries=BE&orderBy=relevance')
