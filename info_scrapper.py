@@ -33,7 +33,8 @@ class InfoScrapper:
 
         print(jsonData)
         print(type(jsonData))
-        print(jsonData['id'])
+        properties = jsonData['property']
+        print(type(properties))
         driver.close()
 
         return info
