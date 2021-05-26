@@ -17,6 +17,10 @@ class InfoScrapper:
         self.typeProperty = list()
         self.subtypeProperty = list()
         self.price = list()
+        self.typeSale = list()
+        self.subtypeSale = list()
+        self.numberRooms = list()
+        self.area = list()
         pass
 
     def extract_info(self, url: str):
@@ -71,7 +75,7 @@ class InfoScrapper:
             self.subtypeProperty.append(properties['subtype'])
         else:
             self.subtypeProperty.append(None)
-        print(self.subtypeProperty)
+        print(self.subtypeProperty) 
 
         # Saving the price of the property
         if jsondict['transaction']['sale']['price']:
@@ -80,10 +84,43 @@ class InfoScrapper:
             self.price.append(None)
         print(self.price)
 
+        # Saving the type of sale of the property
+        if jsondict['transaction']['type']:
+            self.typeSale.append(jsondict['transaction']['type'])
+        else:
+            self.typeSale.append(None)
+        print(self.typeSale)
+
+        # Saving the type of sale of the property
+        if jsondict['transaction']['subtype']:
+            self.subtypeSale.append(jsondict['transaction']['subtype'])
+        else:
+            self.subtypeSale.append(None)
+        print(self.subtypeSale)
+
+        # Saving the type of sale of the property
+        if properties['roomCount']:
+            self.numberRooms.append(properties['roomCount'])
+        else:
+            self.numberRooms.append(None)
+        print(self.numberRooms)
+
+        # Saving the area of the property
+        if properties['netHabitableSurface']:
+            self.area.append(properties['netHabitableSurface'])
+        else:
+            self.area.append(None)
+        print(self.area)
+
+
         ### keep going searching properties ####
 
-        info = pd.DataFrame(list(zip(self.postalCode, self.typeProperty, self.subtypeProperty, self.price)),
-                            columns=['postalCode', 'type', 'subtype', 'price'])
+        info = pd.DataFrame(list(zip(self.postalCode, self.typeProperty,
+                                     self.subtypeProperty, self.price, self.typeSale, self.subtypeSale,
+                                     self.numberRooms, self.area)),
+                            columns=['postalCode', 'type', 'subtype', 'price',
+                                     'typeSale', 'subtypeSale', 'numberOfRooms',
+                                     'area'])
 
         return info
 
