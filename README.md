@@ -13,11 +13,11 @@ the belgian territory, contain both apartments and houses, and count a minimum o
 We choose to use the data from [immoweb.com](http://www.immoweb.com) which is one of the top website in the country.
 
 ##  3. Technically
-The data scraping from the website uses Python's packages selenium and BeautifulSoup. The first one is required to navigate
-through the results of the queries made by an end user. The second package allows to extract the required data. 
+The data scraping from the website uses two tools from Python: selenium and BeautifulSoup. Selenium is used in a class (PageJumper) to navigate
+automatically through the results pages of the website query. The second tool is used in another class (InfoScrapper) to extract the required data for a given property from its html webpage.
 
 ##  4. Usage
-???
+Go to immoweb.com and make a query for having the URL of all the apartments for sale. Do the same for all the houses for sale. These two URLs are passed as parameter in the PageJumper class to get the list of webpage for each property. This list is then passed in the InfoScrapper that will extract the desired data and build the final file housing-data.csv file that contains all the variables required.
 
 ##  5. Contributors
 Jesus Bueno, Dirk Van Winkel, Lyes Rouabah
