@@ -21,14 +21,30 @@ class InfoScrapper:
         self.subtypeSale = list()
         self.numberRooms = list()
         self.area = list()
+        self.hasFullyEquippedKitchen = list()
+        self.kitchenType = list()
+        self.isFurnished = list()
+        self.fireplaceExists = list()
+        self.hasTerrace = list()
+        self.terraceSurface = list()
+        self.hasGarden = list()
+        self.gardenSurface = list()
+        self.facadeCount = list()
+        self.surface = list()
+        self.facadeCount = list()
+        self.hasSwimmingPool = list()
+        self.buildingCondition = list()
         pass
 
     def extract_info(self, url: str):
+        print(url)
         driver = webdriver.Chrome()
         # driver = webdriver.Firefox()
         driver.implicitly_wait(30)
         driver.get(url)
         soup: BeautifulSoup = BeautifulSoup(driver.page_source, 'lxml')
+
+        driver.close()
 
         # And then it's like Beautiful soup
         for elem in soup.find_all('script', attrs={"type": "text/javascript"}):
@@ -40,21 +56,20 @@ class InfoScrapper:
 
         return jsonData
 
-    def scrap_pages(self, url: str):
+    def scrap_links(self, urls):
         links = list()
-        while True:
-            print(len(links))
-            page_links = self.extract_links(url)
-            if page_links and len(links) < 15000:
-                links += page_links
-                url = self.jump_page(url)
-            else:
-                break
-        return links
-    
+        if isinstance(urls, str):
+            link = urls
+            urls = list()
+            urls.append(link)
+
+        for url in urls:
+            jsondict = self.extract_info(url)
+            data = self.get_info(jsondict)
+            self.create_csv(data)
+
     def get_info(self, jsondict):
-        #print(jsondict)
-        info = dict()
+        print(jsondict)
         properties = jsondict['property']
         # Saving the postal code (locality) of the property
         if properties['location']:
@@ -113,14 +128,126 @@ class InfoScrapper:
         print(self.area)
 
 
+        # Saving the kitchen type in "kitchenType"
+        if 'kitchen' in jsondict['property']:
+            if jsondict['property']['kitchen']:
+                if 'type' in jsondict['property']['kitchen']:
+                    if jsondict['property']['kitchen']['type']:
+                        self.kitchenType.append(jsondict['property']['kitchen']['type'])
+                    else:
+                        self.kitchenType.append(None)
+                    if re.search('r/HYPER_EQUIPPED/', jsondict['property']['kitchen']['type']):
+                        self.hasFullyEquippedKitchen.append(0)
+                else:
+                    self.kitchenType.append(None)
+            else:
+                self.kitchenType.append(None)
+        else:
+            self.kitchenType.append(None)
+        print('kitchentype', self.kitchenType)
+
+        # Saving isFurnished
+        if jsondict['transaction']['sale']['isFurnished']:
+            self.isFurnished.append(1)
+        else:
+            self.isFurnished.append(0)
+        print(self.isFurnished)
+
+        # Saving "fireplaceExists"
+        if 'fireplaceExists' in jsondict['property']:
+            if jsondict['property']['fireplaceExists']:
+                self.fireplaceExists.append(1)
+            else:
+                self.fireplaceExists.append(0)
+        else:
+            self.fireplaceExists.append(None)
+        print(self.fireplaceExists)
+
+        # Saving "hasTerrace"
+        if jsondict['property']['hasTerrace']:
+            self.hasTerrace.append(1)
+        else:
+            self.hasTerrace.append(0)
+        print(self.hasTerrace)
+
+        # Saving the terrace surface in "terraceSurface"
+        if jsondict['property']['terraceSurface'] and self.hasTerrace[-1] == 1:
+            self.terraceSurface.append(jsondict['property']['terraceSurface'])
+        else:
+            self.terraceSurface.append(None)
+        print(self.terraceSurface)
+
+        # Saving "hasGarden"
+        if jsondict['property']['hasGarden']:
+            self.hasGarden.append(1)
+        else:
+            self.hasGarden.append(0)
+        print(self.hasGarden)
+
+        # Saving the Garden surface in "GardenSurface"
+        if jsondict['property']['gardenSurface'] and self.hasGarden[-1] == 1:
+            self.gardenSurface.append(jsondict['property']['gardenSurface'])
+        else:
+            self.gardenSurface.append(0)
+        print(self.gardenSurface)
+
+        # Saving the surface of the property
+        if properties['land']:
+            self.surface.append(properties['land']['surface'])
+        else:
+            self.surface.append(0)
+        print(self.surface)
+
+        # Saving the number of facades of the property
+        if properties['building']:
+            if 'facadeCount' in properties['building']:
+                if properties['building']['facadeCount']:
+                    self.facadeCount.append(properties['building']['facadeCount'])
+                else:
+                    self.facadeCount.append(None)
+            else:
+                self.facadeCount.append(None)
+        else:
+            self.facadeCount.append(None)
+        print('facade', self.facadeCount)
+
+        # Saving swimming pool in hasSwimmingPool
+        if jsondict['property']['hasSwimmingPool']:
+            self.hasSwimmingPool.append(1)
+        else:
+            self.hasSwimmingPool.append(0)
+        print(self.hasSwimmingPool)
+
+        # Saving the State of the building in "buildingCondition"
+        if properties['building']:
+            if 'condition' in properties['building']:
+                if jsondict['property']['building']['condition']:
+                    self.buildingCondition.append(jsondict['property']['building']['condition'])
+                else:
+                    self.buildingCondition.append(None)
+            else:
+                self.buildingCondition.append(None)
+        else:
+            self.buildingCondition.append(None)
+
+        print(self.buildingCondition)
+
+
         ### keep going searching properties ####
 
         info = pd.DataFrame(list(zip(self.postalCode, self.typeProperty,
                                      self.subtypeProperty, self.price, self.typeSale, self.subtypeSale,
-                                     self.numberRooms, self.area)),
+                                     self.numberRooms, self.area, self.hasFullyEquippedKitchen,
+                                     self.kitchenType, self.isFurnished,
+                                     self.fireplaceExists, self.hasTerrace, self.terraceSurface,
+                                     self.hasGarden, self.gardenSurface, self.surface,
+                                     self.facadeCount, self.hasSwimmingPool, self.buildingCondition)),
                             columns=['postalCode', 'type', 'subtype', 'price',
-                                     'typeSale', 'subtypeSale', 'numberOfRooms',
-                                     'area'])
+                                     'typeSale', 'subtypeSale', 'roomsCount',
+                                     'area', 'hasFullyEquippedKitchen', 'kitchenType', 'isFurnished',
+                                     'fireplaceExists', 'hasTerrace', 'terraceSurface',
+                                     'hasGarden', 'gardenSurface', 'landSurface',
+                                     'facadeCount', 'hasSwimmingPool', 'buildingCondition'])
 
         return info
 
@@ -128,9 +255,3 @@ class InfoScrapper:
         file_links_housing = pd.DataFrame(data)
         file_links_housing.to_csv('assets/housing-data.csv')
 
-infograpper = InfoScrapper()
-info = infograpper.extract_info('https://www.immoweb.be/en/classified/apartment/for-sale/ixelles/1050/9333411?searchId=60ad0a1ce3697')
-
-data = infograpper.get_info(info)
-
-infograpper.create_csv(data)

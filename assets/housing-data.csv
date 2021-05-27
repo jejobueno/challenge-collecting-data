@@ -1,2 +1,1 @@
-,postalCode,type,subtype,price,typeSale,subtypeSale,numberOfRooms,area
-0,1050,APARTMENT,APARTMENT,1839000,FOR_SALE,BUY_REGULAR,4,203
+,postalCode,type,subtype,price,typeSale,subtypeSale,roomsCount,area,hasFullyEquippedKitchen,kitchenType,isFurnished,fireplaceExists,hasTerrace,terraceSurface,hasGarden,gardenSurface,landSurface,facadeCount,hasSwimmingPool,buildingCondition
