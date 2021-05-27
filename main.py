@@ -5,8 +5,8 @@ from info_scrapper import InfoScrapper
 LINKS_APPARTEMENT = 'https://www.immoweb.be/en/search/apartment/for-sale?countries=BE&orderBy=relevance'
 LINKS_HOUSES = 'https://www.immoweb.be/en/search/house/for-sale?countries=BE&orderBy=relevance'
 
-pageJumper = PageJumper()
-pageJumper.create_csv([LINKS_HOUSES, LINKS_APPARTEMENT], 11000)
+#pageJumper = PageJumper()
+#pageJumper.create_csv([LINKS_HOUSES, LINKS_APPARTEMENT], 11000)
 
 # reading CSV file
 data = read_csv('assets/linksInmoweb.csv')

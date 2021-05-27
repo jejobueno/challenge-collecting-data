@@ -37,16 +37,18 @@ class InfoScrapper:
         pass
 
     def extract_info(self, url: str):
-        print(url)
-        driver = webdriver.Chrome()
+        #print(url)
+        #driver = webdriver.Chrome()
         # driver = webdriver.Firefox()
-        driver.implicitly_wait(30)
-        driver.get(url)
-        soup: BeautifulSoup = BeautifulSoup(driver.page_source, 'lxml')
-
-        driver.close()
+        #driver.implicitly_wait(30)
+        #driver.get(url)
+        page = requests.get(url)
+        soup: BeautifulSoup = BeautifulSoup(page.text, 'lxml')
+        print(page.status_code)
+        #driver.close()
 
         # And then it's like Beautiful soup
+
         for elem in soup.find_all('script', attrs={"type": "text/javascript"}):
             if 'window.classified' in str(elem):
                 dataStr = str(elem)
@@ -64,9 +66,12 @@ class InfoScrapper:
             urls.append(link)
 
         for url in urls:
-            jsondict = self.extract_info(url)
-            data = self.get_info(jsondict)
-            self.create_csv(data)
+            if requests.get(url).status_code == 200:
+                jsondict = self.extract_info(url)
+                data = self.get_info(jsondict)
+            else:
+                pass
+        self.create_csv(data)
 
     def get_info(self, jsondict):
         #print(jsondict)
@@ -111,7 +116,7 @@ class InfoScrapper:
             self.subtypeSale.append(jsondict['transaction']['subtype'])
         else:
             self.subtypeSale.append(None)
-        print(self.subtypeSale)
+        #print(self.subtypeSale)
 
         # Saving the type of sale of the property
         if properties['roomCount']:
@@ -140,13 +145,16 @@ class InfoScrapper:
                             self.hasFullyEquippedKitchen.append(0)
                     else:
                         self.kitchenType.append(None)
-
+                        self.hasFullyEquippedKitchen.append(None)
                 else:
                     self.kitchenType.append(None)
+                    self.hasFullyEquippedKitchen.append(None)
             else:
                 self.kitchenType.append(None)
+                self.hasFullyEquippedKitchen.append(None)
         else:
             self.kitchenType.append(None)
+            self.hasFullyEquippedKitchen.append(None)
         #print("hasFullEquippedKitchen", self.hasFullyEquippedKitchen)
         #print('kitchentype', self.kitchenType)
 
@@ -234,10 +242,31 @@ class InfoScrapper:
         else:
             self.buildingCondition.append(None)
 
-        #print(self.buildingCondition)
 
 
         ### keep going searching properties ####
+
+        print(len(self.postalCode))
+        print(len(self.typeProperty))
+        print(len(self.subtypeProperty))
+        print(len(self.price))
+        print(len(self.typeSale))
+        print(len(self.subtypeSale))
+        print(len(self.numberRooms))
+        print(len(self.area))
+        print('hasFullyEquiped', len(self.hasFullyEquippedKitchen))
+        print('kitchentype', len(self.kitchenType))
+        print(len(self.isFurnished))
+        print(len(self.fireplaceExists))
+        print(len(self.hasTerrace))
+        print(len(self.terraceSurface))
+        print(len(self.hasGarden))
+        print(len(self.gardenSurface))
+        print(len(self.facadeCount))
+        print(len(self.surface))
+        print(len(self.facadeCount))
+        print(len(self.hasSwimmingPool))
+        print(len(self.buildingCondition))
 
         info = pd.DataFrame(list(zip(self.postalCode, self.typeProperty,
                                      self.subtypeProperty, self.price, self.typeSale, self.subtypeSale,
@@ -253,6 +282,12 @@ class InfoScrapper:
                                      'hasGarden', 'gardenSurface', 'landSurface',
                                      'facadeCount', 'hasSwimmingPool', 'buildingCondition'])
 
+        print(info)
+        print(len(info))
+
+        print(len(self.postalCode))
+        if len(self.postalCode) != len(info):
+            print('error')
         return info
 
     def create_csv(self, data):
