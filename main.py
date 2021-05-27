@@ -6,7 +6,7 @@ LINKS_APPARTEMENT = 'https://www.immoweb.be/en/search/apartment/for-sale?countri
 LINKS_HOUSES = 'https://www.immoweb.be/en/search/house/for-sale?countries=BE&orderBy=relevance'
 
 pageJumper = PageJumper()
-pageJumper.create_csv([LINKS_HOUSES, LINKS_APPARTEMENT], 30)
+pageJumper.create_csv([LINKS_HOUSES, LINKS_APPARTEMENT], 50)
 
 # reading CSV file
 data = read_csv('assets/linksInmoweb.csv')

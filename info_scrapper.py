@@ -134,10 +134,11 @@ class InfoScrapper:
                 if 'type' in jsondict['property']['kitchen']:
                     if jsondict['property']['kitchen']['type']:
                         self.kitchenType.append(jsondict['property']['kitchen']['type'])
+                        if re.search('r/HYPER_EQUIPPED/', jsondict['property']['kitchen']['type']):
+                            self.hasFullyEquippedKitchen.append(0)
                     else:
                         self.kitchenType.append(None)
-                    if re.search('r/HYPER_EQUIPPED/', jsondict['property']['kitchen']['type']):
-                        self.hasFullyEquippedKitchen.append(0)
+
                 else:
                     self.kitchenType.append(None)
             else:
