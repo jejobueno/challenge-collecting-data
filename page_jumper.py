@@ -44,13 +44,26 @@ class PageJumper:
             urls = list()
             urls.append(link)
 
+        linksPerLink = int(linkCount/len(urls))
+        page_links = list()
+        linkNumber = 0
+
         for url in urls:
+            linkNumber += 1
             while True:
-                print(len(links))
-                page_links = self.extract_links(url)
-                if page_links and len(links) < (linkCount*len(urls)):
-                    links += page_links
-                    url = self.jump_page(url)
+                if len(links) < linksPerLink*linkNumber:
+                    page_links = self.extract_links(url)
+                    if linksPerLink < 30:
+                        links += page_links[0:linksPerLink]
+                        url = self.jump_page(url)
+                        break
+                    else:
+                        if len(links) + len(page_links) <= linksPerLink*linkNumber:
+                            links += page_links
+                            url = self.jump_page(url)
+                        else:
+                            links += page_links[0:linksPerLink*linkNumber-(len(page_links)+len(links))]
+                            break
                 else:
                     break
 
