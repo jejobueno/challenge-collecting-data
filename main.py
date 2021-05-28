@@ -2,7 +2,7 @@ from utils.page_jumper import PageJumper
 from pandas import *
 from utils.info_scrapper import InfoScrapper
 
-# Seen that each search page of Inmoweb has a limit of 9990 announcements,
+# Seen that each search page of Immoweb.com has a limit of 9990 announcements,
 # we are going to recollect the 11.000 samples from the houses search page
 # and the apartments search page separately.
 # We save the links as 'constants'
