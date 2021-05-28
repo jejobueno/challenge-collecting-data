@@ -13,7 +13,6 @@ the belgian territory, contain both apartments and houses, and count a minimum o
 We choose to use the data from [immoweb.com](http://www.immoweb.com) which is one of the top website in the country.
 
 
-## Evaluation criterias
 | Data              | Variable               | Poissble Values             |
 |-------------------|------------------------|-----------------------------|
 | Locality          | postalCode             |  xxxx (four digits int)     |
