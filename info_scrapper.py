@@ -3,6 +3,7 @@ from time import strftime
 from bs4 import BeautifulSoup
 import pandas as pd
 import json
+import os
 import re
 import requests
 
@@ -34,19 +35,11 @@ class InfoScrapper:
         self.facadeCount = list()
         self.hasSwimmingPool = list()
         self.buildingCondition = list()
+
+        self.connectionErrors = 0
         pass
 
-    def extract_info(self, url: str):
-        #print(url)
-        #driver = webdriver.Chrome()
-        # driver = webdriver.Firefox()
-        #driver.implicitly_wait(30)
-        #driver.get(url)
-        page = requests.get(url)
-        soup: BeautifulSoup = BeautifulSoup(page.text, 'lxml')
-        print(page.status_code)
-        #driver.close()
-
+    def extract_info(self, soup: BeautifulSoup):
         # And then it's like Beautiful soup
 
         for elem in soup.find_all('script', attrs={"type": "text/javascript"}):
@@ -66,72 +59,78 @@ class InfoScrapper:
             urls.append(link)
 
         for url in urls:
-            if requests.get(url).status_code == 200:
-                jsondict = self.extract_info(url)
+            page = requests.get(url)
+            if page.status_code == 200:
+                soup: BeautifulSoup = BeautifulSoup(page.text, 'lxml')
+
+                jsondict = self.extract_info(soup)
                 data = self.get_info(jsondict)
+                print(data)
+                print('Conection erros:' ,self.connectionErrors)
+
             else:
-                pass
+                self.connectionErrors += 1
         self.create_csv(data)
+        print(self.connectionErrors)
 
     def get_info(self, jsondict):
-        #print(jsondict)
+        # print(jsondict)
         properties = jsondict['property']
         # Saving the postal code (locality) of the property
         if properties['location']:
             self.postalCode.append(properties['location']['postalCode'])
         else:
             self.postalCode.append(None)
-        #print(self.postalCode)
+        # print(self.postalCode)
 
         # Saving the type of the property
         if properties['type']:
             self.typeProperty.append(properties['type'])
         else:
             self.typeProperty.append(None)
-        #print(self.typeProperty)
+        # print(self.typeProperty)
 
         # Saving the subtype of the property
         if properties['type']:
             self.subtypeProperty.append(properties['subtype'])
         else:
             self.subtypeProperty.append(None)
-        #print(self.subtypeProperty)
+        # print(self.subtypeProperty)
 
         # Saving the price of the property
         if jsondict['transaction']['sale']['price']:
             self.price.append(jsondict['transaction']['sale']['price'])
         else:
             self.price.append(None)
-        #print(self.price)
+        # print(self.price)
 
         # Saving the type of sale of the property
         if jsondict['transaction']['type']:
             self.typeSale.append(jsondict['transaction']['type'])
         else:
             self.typeSale.append(None)
-        #print(self.typeSale)
+        # print(self.typeSale)
 
         # Saving the type of sale of the property
         if jsondict['transaction']['subtype']:
             self.subtypeSale.append(jsondict['transaction']['subtype'])
         else:
             self.subtypeSale.append(None)
-        #print(self.subtypeSale)
+        # print(self.subtypeSale)
 
         # Saving the type of sale of the property
         if properties['roomCount']:
             self.numberRooms.append(properties['roomCount'])
         else:
             self.numberRooms.append(None)
-        #print(self.numberRooms)
+        # print(self.numberRooms)
 
         # Saving the area of the property
         if properties['netHabitableSurface']:
             self.area.append(properties['netHabitableSurface'])
         else:
             self.area.append(None)
-        #print(self.area)
-
+        # print(self.area)
 
         # Saving the kitchen type in "kitchenType"
         if 'kitchen' in jsondict['property']:
@@ -155,15 +154,15 @@ class InfoScrapper:
         else:
             self.kitchenType.append(None)
             self.hasFullyEquippedKitchen.append(None)
-        #print("hasFullEquippedKitchen", self.hasFullyEquippedKitchen)
-        #print('kitchentype', self.kitchenType)
+        # print("hasFullEquippedKitchen", self.hasFullyEquippedKitchen)
+        # print('kitchentype', self.kitchenType)
 
         # Saving isFurnished
         if jsondict['transaction']['sale']['isFurnished']:
             self.isFurnished.append(1)
         else:
             self.isFurnished.append(0)
-        #print(self.isFurnished)
+        # print(self.isFurnished)
 
         # Saving "fireplaceExists"
         if 'fireplaceExists' in jsondict['property']:
@@ -173,42 +172,42 @@ class InfoScrapper:
                 self.fireplaceExists.append(0)
         else:
             self.fireplaceExists.append(None)
-        #print(self.fireplaceExists)
+        # print(self.fireplaceExists)
 
         # Saving "hasTerrace"
         if jsondict['property']['hasTerrace']:
             self.hasTerrace.append(1)
         else:
             self.hasTerrace.append(0)
-        #print(self.hasTerrace)
+        # print(self.hasTerrace)
 
         # Saving the terrace surface in "terraceSurface"
         if jsondict['property']['terraceSurface'] and self.hasTerrace[-1] == 1:
             self.terraceSurface.append(jsondict['property']['terraceSurface'])
         else:
             self.terraceSurface.append(None)
-        #print(self.terraceSurface)
+        # print(self.terraceSurface)
 
         # Saving "hasGarden"
         if jsondict['property']['hasGarden']:
             self.hasGarden.append(1)
         else:
             self.hasGarden.append(0)
-        #print(self.hasGarden)
+        # print(self.hasGarden)
 
         # Saving the Garden surface in "GardenSurface"
         if jsondict['property']['gardenSurface'] and self.hasGarden[-1] == 1:
             self.gardenSurface.append(jsondict['property']['gardenSurface'])
         else:
             self.gardenSurface.append(0)
-        #print(self.gardenSurface)
+        # print(self.gardenSurface)
 
         # Saving the surface of the property
         if properties['land']:
             self.surface.append(properties['land']['surface'])
         else:
             self.surface.append(0)
-        #print(self.surface)
+        # print(self.surface)
 
         # Saving the number of facades of the property
         if properties['building']:
@@ -221,14 +220,14 @@ class InfoScrapper:
                 self.facadeCount.append(None)
         else:
             self.facadeCount.append(None)
-        #print('facade', self.facadeCount)
+        # print('facade', self.facadeCount)
 
         # Saving swimming pool in hasSwimmingPool
         if jsondict['property']['hasSwimmingPool']:
             self.hasSwimmingPool.append(1)
         else:
             self.hasSwimmingPool.append(0)
-        #print(self.hasSwimmingPool)
+        # print(self.hasSwimmingPool)
 
         # Saving the State of the building in "buildingCondition"
         if properties['building']:
@@ -241,32 +240,6 @@ class InfoScrapper:
                 self.buildingCondition.append(None)
         else:
             self.buildingCondition.append(None)
-
-
-
-        ### keep going searching properties ####
-
-        print(len(self.postalCode))
-        print(len(self.typeProperty))
-        print(len(self.subtypeProperty))
-        print(len(self.price))
-        print(len(self.typeSale))
-        print(len(self.subtypeSale))
-        print(len(self.numberRooms))
-        print(len(self.area))
-        print('hasFullyEquiped', len(self.hasFullyEquippedKitchen))
-        print('kitchentype', len(self.kitchenType))
-        print(len(self.isFurnished))
-        print(len(self.fireplaceExists))
-        print(len(self.hasTerrace))
-        print(len(self.terraceSurface))
-        print(len(self.hasGarden))
-        print(len(self.gardenSurface))
-        print(len(self.facadeCount))
-        print(len(self.surface))
-        print(len(self.facadeCount))
-        print(len(self.hasSwimmingPool))
-        print(len(self.buildingCondition))
 
         info = pd.DataFrame(list(zip(self.postalCode, self.typeProperty,
                                      self.subtypeProperty, self.price, self.typeSale, self.subtypeSale,
@@ -282,15 +255,8 @@ class InfoScrapper:
                                      'hasGarden', 'gardenSurface', 'landSurface',
                                      'facadeCount', 'hasSwimmingPool', 'buildingCondition'])
 
-        print(info)
-        print(len(info))
-
-        print(len(self.postalCode))
-        if len(self.postalCode) != len(info):
-            print('error')
         return info
 
     def create_csv(self, data):
         file_links_housing = pd.DataFrame(data)
-        file_links_housing.to_csv('assets/housing-data.csv')
-
+        file_links_housing.to_csv('assets/housing-data3.csv')
