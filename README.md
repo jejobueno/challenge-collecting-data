@@ -12,6 +12,14 @@ the belgian territory, contain both apartments and houses, and count a minimum o
 ##  2. Our strategy
 We choose to use the data from [immoweb.com](http://www.immoweb.com) which is one of the top website in the country.
 
+
+## Evaluation criterias
+| Data              | Variable               | Poissble Values             |
+|-------------------|------------------------|-----------------------------|
+| Locality          | postalCode             |  xxxx (four digits int)     |
+| Type of Property  | type                   |  ['HOUSE', 'HOUSE_GROUP]    |
+
+
 ##  3. Technically
 The data scraping from the website uses two tools from Python: selenium and BeautifulSoup. Selenium is used in a class (PageJumper) to navigate
 automatically through the results pages of the website query. The second tool is used in another class (InfoScrapper) to extract the required data for a given property from its html webpage.
