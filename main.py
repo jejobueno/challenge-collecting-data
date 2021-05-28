@@ -34,6 +34,10 @@ print('We have', len(links), 'links in our List')
 
 # Now we call our InfoScrapper object which is going to collect the necessarily
 # data from each link and create and csv file in the './assets' folder. You only
-# need to give the List of links and the name you want for the file
+# need to give the List of links and the name you want for the file. The
+# InfoScrapper object will print each time the quantity of error connections for
+# the links and also the quantity of links that have been well scrapped
 infoScrapper = InfoScrapper()
 infoScrapper.scrap_links(links, 'housing-data3.csv')
+
+# Now have a sit and order a pizza. It may take up to 3 hours!
