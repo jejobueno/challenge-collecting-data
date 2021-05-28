@@ -11,9 +11,15 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from typing import List
 
+
 class InfoScrapper:
 
     def __init__(self):
+        """
+        This method initialize the object and all the list for each
+        parameter we are going to scrap. Also initializes a variable
+        to count the quantity of error connections
+        """
         self.postalCode = list()
         self.typeProperty = list()
         self.subtypeProperty = list()
@@ -36,6 +42,7 @@ class InfoScrapper:
         self.hasSwimmingPool = list()
         self.buildingCondition = list()
 
+        # Register of connection errors
         self.connectionErrors = 0
         pass
 
@@ -64,6 +71,7 @@ class InfoScrapper:
                 soup: BeautifulSoup = BeautifulSoup(page.text, 'lxml')
 
                 jsondict = self.extract_info(soup)
+                print(jsondict)
                 self.get_info(jsondict)
                 print('Conection erros:', self.connectionErrors)
                 print('Scrapped pages:', len(self.price))
@@ -118,8 +126,8 @@ class InfoScrapper:
         # print(self.subtypeSale)
 
         # Saving the type of sale of the property
-        if properties['roomCount']:
-            self.numberRooms.append(properties['roomCount'])
+        if properties['bedroomCount']:
+            self.numberRooms.append(properties['bedroomCount'])
         else:
             self.numberRooms.append(None)
         # print(self.numberRooms)
@@ -250,7 +258,7 @@ class InfoScrapper:
                                      self.hasGarden, self.gardenSurface, self.surface,
                                      self.facadeCount, self.hasSwimmingPool, self.buildingCondition)),
                             columns=['postalCode', 'type', 'subtype', 'price',
-                                     'typeSale', 'subtypeSale', 'roomsCount',
+                                     'typeSale', 'subtypeSale', 'BedroomsCount',
                                      'area', 'hasFullyEquippedKitchen', 'kitchenType', 'isFurnished',
                                      'fireplaceExists', 'hasTerrace', 'terraceSurface',
                                      'hasGarden', 'gardenSurface', 'landSurface',

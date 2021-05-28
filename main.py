@@ -17,17 +17,17 @@ pageJumper = PageJumper()
 # We want to analyze our both constants links, getting back 11000 links of
 # announcements. We are going to get 5500 links from houses and 5500 from
 # apartments
-links = pageJumper.scrap_pages([LINKS_HOUSES, LINKS_APPARTEMENT], 30)
+#links = pageJumper.scrap_pages([LINKS_HOUSES, LINKS_APPARTEMENT], 11000)
 
 # In case you feel lazy to wait to the page jumper to get the links (can be
 # one hour more or less) We've prepared a csv file using the create_csv method
 # of PageJumper with 11000 links of announcements:
 
 # We charge our csv file
-# data = read_csv('assets/linksInmoweb.csv')
+data = read_csv('assets/linksInmoweb.csv')
 
 # converting column data to list
-# links = data['link'].tolist()
+links = data['link'].tolist()
 
 # Just to check ;)
 print('We have', len(links), 'links in our List')
