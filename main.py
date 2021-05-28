@@ -38,6 +38,6 @@ print('We have', len(links), 'links in our List')
 # InfoScrapper object will print each time the quantity of error connections for
 # the links and also the quantity of links that have been well scrapped
 infoScrapper = InfoScrapper()
-infoScrapper.scrap_links(links, 'housing-data3.csv')
+infoScrapper.scrap_links(links, 'housing-data.csv')
 
 # Now have a sit and order a pizza. It may take up to 3 hours!

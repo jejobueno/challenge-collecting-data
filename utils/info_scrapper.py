@@ -82,7 +82,7 @@ class InfoScrapper:
 
                 # We print the record of connection errors and well scrapped
                 # pages
-                print('Conection erros:', self.connectionErrors)
+                print('Connection errors:', self.connectionErrors)
                 print('Scrapped pages:', len(self.price))
 
             else:
