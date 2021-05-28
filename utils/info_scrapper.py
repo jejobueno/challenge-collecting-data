@@ -9,7 +9,7 @@ import requests
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-
+from typing import List
 
 class InfoScrapper:
 
@@ -51,7 +51,7 @@ class InfoScrapper:
 
         return jsonData
 
-    def scrap_links(self, urls):
+    def scrap_links(self, urls: List[str], fileName: str):
         links = list()
         if isinstance(urls, str):
             link = urls
@@ -64,14 +64,13 @@ class InfoScrapper:
                 soup: BeautifulSoup = BeautifulSoup(page.text, 'lxml')
 
                 jsondict = self.extract_info(soup)
-                data = self.get_info(jsondict)
-                print(data)
-                print('Conection erros:' ,self.connectionErrors)
+                self.get_info(jsondict)
+                print('Conection erros:', self.connectionErrors)
+                print('Scrapped pages:', len(self.price))
 
             else:
                 self.connectionErrors += 1
-        self.create_csv(data)
-        print(self.connectionErrors)
+        self.create_csv(fileName)
 
     def get_info(self, jsondict):
         # print(jsondict)
@@ -241,7 +240,9 @@ class InfoScrapper:
         else:
             self.buildingCondition.append(None)
 
-        info = pd.DataFrame(list(zip(self.postalCode, self.typeProperty,
+    def create_csv(self, fileName: str):
+
+        data = pd.DataFrame(list(zip(self.postalCode, self.typeProperty,
                                      self.subtypeProperty, self.price, self.typeSale, self.subtypeSale,
                                      self.numberRooms, self.area, self.hasFullyEquippedKitchen,
                                      self.kitchenType, self.isFurnished,
@@ -255,8 +256,5 @@ class InfoScrapper:
                                      'hasGarden', 'gardenSurface', 'landSurface',
                                      'facadeCount', 'hasSwimmingPool', 'buildingCondition'])
 
-        return info
-
-    def create_csv(self, data):
         file_links_housing = pd.DataFrame(data)
-        file_links_housing.to_csv('assets/housing-data3.csv')
+        file_links_housing.to_csv('assets/' + fileName)
