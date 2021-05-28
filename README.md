@@ -42,8 +42,11 @@ automatically through the results pages of the website query. The second tool is
 
 
 ##  4. Usage
-Go to immoweb.com and make a query for having the URL of all the apartments for sale. Do the same for all the houses for sale.
-These two URLs are passed as parameter in the PageJumper class to get the list of webpage for each property.
+We went to  immoweb.com and make a query to search for all the apartments for sale. Do the same for all the houses for sale.
+
+Then use the main.py file to run the code!
+
+These two URLs are passed as parameter in the PageJumper class to get the list of webpage for each property for sale.
 This list is then passed in the InfoScrapper that will extract the desired data and build the final file housing-data.csv file that contains all the variables required.
 
 ### In details
