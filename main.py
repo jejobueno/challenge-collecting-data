@@ -24,7 +24,7 @@ pageJumper = PageJumper()
 # of PageJumper with 11000 links of announcements:
 
 # We charge our csv file
-data = read_csv('assets/linksInmoweb.csv')
+data = read_csv('assets/linksInmoweb.csv', error_bad_lines=False)
 
 # converting column data to list
 links = data['link'].tolist()
